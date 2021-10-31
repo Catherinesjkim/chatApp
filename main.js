@@ -14,7 +14,7 @@ let client = AgoraRTC.createClient({mode:'rtc', 'codec':"vp8"})
 
 let config = {
     appid: 'ab164abd0feb4d13908da5f2c7327cd2', 
-    token: '006ab164abd0feb4d13908da5f2c7327cd2IACqW8EXiTu7UYZQg/MGeeZ483XcSI+bnTdxg45kvweaEJDsq1EAAAAAEACcPzRR1Gx5YQEAAQDUbHlh',
+    token: null,
     uid: null, 
     channel: 'videoConference',
 }
