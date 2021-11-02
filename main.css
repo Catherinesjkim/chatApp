@@ -1,4 +1,36 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #ffc0cb;
+  color: aliceblue;
+  font-family: "Poppins", sans-serif;
+}
+
+main {
+  width: 1400px;
+  margin: 0 auto;
+  height: 75vh;
+}
+
+#user-streams {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+  gap: 1em;
+  height: 100%;
+}
+
+/* .video-containers {
+} */
+
 .video-player {
   height: 100px;
-  width: 200px;
+  width: 100px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+@media screen and (max-width: 1400px) {
+  main {
+    width: 195px;
+  }
 }

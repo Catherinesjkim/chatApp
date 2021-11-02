@@ -15,7 +15,7 @@ let client = AgoraRTC.createClient({mode:'rtc', 'codec':"vp8"})
 // #2 - Channel Name: videoConference
 let config = {
     appid: 'ab164abd0feb4d13908da5f2c7327cd2', 
-    token: '006ab164abd0feb4d13908da5f2c7327cd2IABq8tqsoQwnkUUwli7URI+ZBhPNKf+r/i2QaEjPIvteNJDsq1EAAAAAEACcPzRRHxyAYQEAAQAfHIBh',
+    token: '006ab164abd0feb4d13908da5f2c7327cd2IADjPkPuzGiCinPZMwak8xM8hYMJBaBrWhgWJszhmG89l5Dsq1EAAAAAEAC3nyPhif2CYQEAAQCJ/YJh',
     uid: null, 
     channel: 'videoConference',
 }
@@ -38,12 +38,29 @@ let localTrackState = {
 // Other users that joined a stream - we need to store our subscribtion to other users when joined our stream
 let remoteTracks = {}
 
-
 // query selector .getElementById and listen for a click event. 
 // On click output 'User Joined stream' on the console
 document.getElementById('join-btn').addEventListener('click', async ()=> {
     console.log('A USER HAS JOINED OUR STREAM')
     await joinStreams()
+})
+
+
+document.getElementById('leave-btn').addEventListener('click', async () => {
+    for(trackName in localTracks){
+        let track = localTracks[trackName]
+        if(track){
+            // stops camera and mic
+            track.stop()
+
+            // disconnects from your camera and mic
+            track.close()
+            localTracks[trackName] = null
+        }
+    }
+
+    // disconnect from their stream and let all remote users know that I left and remove our connection
+    await client.leave()
 })
 
 // We need to wait for some network calls
@@ -85,8 +102,9 @@ let joinStreams = async () => {
 }
 
 
-let handleUserLeft = async () => {
-    console.log('User has left')
+let handleUserLeft = async (user) => {
+    delete remoteTracks[user.uid]
+    document.getElementById(`video-wrapper-${user.uid}`)
 }
 
 
