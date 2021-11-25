@@ -35,33 +35,44 @@ let localTrackState = {
     videoTrackMuted:false
 }
 
-// create a state for our local track. By adding this, it removes the UID when a user leaves the channel.
-let localTracksState = {
-    audioTrackMuted: false,
-    videoTrackMuted: false,
-}
-
 // #5 - Set remote tracks to store other users' obj.
 // Other users that joined a stream - we need to store our subscribtion to other users when joined our stream
 let remoteTracks = {}
 
-// query selector .getElementById and listen for a click event. 
+// query selector .getElementById and listen for a click event
 // On click output 'User Joined stream' on the console
 document.getElementById('join-btn').addEventListener('click', async ()=> {
-    console.log('USER JOINED OUR STREAM')
+    console.log('USER JOINED STREAM')
     await joinStreams()
 })
 
+// Adding mute/un-mute functionality to the mute button
 document.getElementById('mic-btn').addEventListener('click', async () => {
-    if(!localTracksState.audioTrackMuted){
+    // Check if what the satte of muted currently is
+    // Disable button
+    if(!localTrackState.audioTrackMuted){
+        // Mute your audio
         await localTracks.audioTrack.setMuted(true)
         localTrackState.audioTrackMuted = true
     } else {
-        await localTracks.audioTrack.setMuted(true)
-        localTrackState.audioTrackMuted = true
+        await localTracks.audioTrack.setMuted(false)
+        localTrackState.audioTrackMuted = false
     }
 })
 
+// Adding publish/un-publish video functionality to the mute button
+document.getElementById('camera-btn').addEventListener('click', async () => {
+    // Check if what the state of muted currently is
+    // Disable button
+    if(!localTrackState.videoTrackMuted){
+        // Mute your audio
+        await localTracks.videoTrack.setMuted(true);
+        localTrackState.videoTrackMuted = true
+    } else {
+        await localTracks.videoTrack.setMuted(false)
+        localTrackState.videoTrackMuted = false
+    }
+})
 
 // When the local client (main host) leaves, removes it from the stream.
 document.getElementById('leave-btn').addEventListener('click', async () => {
@@ -86,6 +97,7 @@ document.getElementById('leave-btn').addEventListener('click', async () => {
 // We need to wait for some network calls
 // Method will take all my info and set user stream in frame
 let joinStreams = async () => {
+    // Is this place hear strategically or can I add to end of method?
 
     // client event handler, listen for the user-published event from Agora.io
     // Event Handler working automatically
@@ -127,16 +139,20 @@ let handleUserLeft = async (user) => {
     document.getElementById(`video-wrapper-${user.uid}`)
 }
 
-
+// if we unmuted it and does exist, then we want to add the video again.
+// removing the dupe before adding it again. 
 let handleUserJoined = async (user, mediaType) => {
     console.log('User has joined our stream')
-
     // #11 - Add user to list of remote users
     remoteTracks[user.uid] = user
 
     // #12 - Subscrive to remote users
     await client.subscribe(user, mediaType)
 
+    let videoPlayer = document.getElementById(`video-wrapper-${user.uid}`)
+    if(videoPlayer != null){
+        videoPlayer.remove()
+    }
 
     if (mediaType === 'video'){
         // creating video player for a remote user

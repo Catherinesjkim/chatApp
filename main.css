@@ -20,6 +20,11 @@ main {
 }
 
 /* .video-containers {
+  position: relative;
+  padding: 0;
+  margin: 0;
+  background-color: #1f1f1f8e;
+  border-radius: 10px;
 } */
 
 .video-player {
