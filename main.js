@@ -1,6 +1,7 @@
 // The Agora Web SDK is a JavaScript library loaded by an HTML web page. 
-// The Agora Web SDK library uses APIs int he web browser to establish connections 
+// The Agora Web SDK library uses APIs in the web browser to establish connections 
 // and control the communication and live broadcast services.
+
 // AgoraRTC is the entry point for all the methods that can be called in Agora Web SDK
 // AgoraRTC provides the following methods: createClient, createStream, getDevices, getSupportedCodec, checkSystemRequirements
 
@@ -15,7 +16,7 @@ let client = AgoraRTC.createClient({mode:'rtc', 'codec':"vp8"})
 // #2 - Channel Name: videoConference
 let config = {
     appid: 'ab164abd0feb4d13908da5f2c7327cd2', 
-    token: '006ab164abd0feb4d13908da5f2c7327cd2IADjPkPuzGiCinPZMwak8xM8hYMJBaBrWhgWJszhmG89l5Dsq1EAAAAAEAC3nyPhif2CYQEAAQCJ/YJh',
+    token: '006ab164abd0feb4d13908da5f2c7327cd2IABYEtNs7rErqnjvGk7UwtvQ7CRfh+zhJhh85TKN05nlMpDsq1EAAAAAEAAGMGkoD/mgYQEAAQAP+aBh',
     uid: null, 
     channel: 'videoConference',
 }
@@ -34,6 +35,12 @@ let localTrackState = {
     videoTrackMuted:false
 }
 
+// create a state for our local track. By adding this, it removes the UID when a user leaves the channel.
+let localTracksState = {
+    audioTrackMuted: false,
+    videoTrackMuted: false,
+}
+
 // #5 - Set remote tracks to store other users' obj.
 // Other users that joined a stream - we need to store our subscribtion to other users when joined our stream
 let remoteTracks = {}
@@ -41,11 +48,22 @@ let remoteTracks = {}
 // query selector .getElementById and listen for a click event. 
 // On click output 'User Joined stream' on the console
 document.getElementById('join-btn').addEventListener('click', async ()=> {
-    console.log('A USER HAS JOINED OUR STREAM')
+    console.log('USER JOINED OUR STREAM')
     await joinStreams()
 })
 
+document.getElementById('mic-btn').addEventListener('click', async () => {
+    if(!localTracksState.audioTrackMuted){
+        await localTracks.audioTrack.setMuted(true)
+        localTrackState.audioTrackMuted = true
+    } else {
+        await localTracks.audioTrack.setMuted(true)
+        localTrackState.audioTrackMuted = true
+    }
+})
 
+
+// When the local client (main host) leaves, removes it from the stream.
 document.getElementById('leave-btn').addEventListener('click', async () => {
     for(trackName in localTracks){
         let track = localTracks[trackName]
@@ -61,7 +79,9 @@ document.getElementById('leave-btn').addEventListener('click', async () => {
 
     // disconnect from their stream and let all remote users know that I left and remove our connection
     await client.leave()
+    document.getElementById('user-streams').innerHTML = ''
 })
+
 
 // We need to wait for some network calls
 // Method will take all my info and set user stream in frame
@@ -101,7 +121,7 @@ let joinStreams = async () => {
 
 }
 
-
+// When the remote user is leaving, it will remove the remote user and their video frame from our screen.
 let handleUserLeft = async (user) => {
     delete remoteTracks[user.uid]
     document.getElementById(`video-wrapper-${user.uid}`)
@@ -135,3 +155,20 @@ let handleUserJoined = async (user, mediaType) => {
 
     
 }
+
+// Unsubscribe from audio and video tracks
+// Call AgoraRTCClient.unsubscribe to unsubscribe from the audio and video tracks of remote users.
+// Subscribe to a specific user's audio and video
+// await client.subscribe(user, "audio");
+// await client.subscribe(user, "video");
+// Unsubscribe from a specific user's video
+// await client.unsubscribe(user, "video");
+// Or unsubscribe from all the media tracks of a specific user
+// await client.unsubscribe(user);
+// Re: unsubscription:
+// When a remote user unpublishes a track, the local user receives the user-unpublished callback.
+// The SDK automatically releases the corresponding RemoteTrack object, and you do not need to call unsubscribe.
+// This method is asynchronous and needs to be used with Promise or async/await.
+// Use async methods when we have a lengthy operations. We usually need such an operation to complete in order
+// to meaningfully continue program execution, but we don't want to "pause" until the operation completes
+// (because pausing might mean e.g. that the UI stops responding, which is clearly undesirable).
