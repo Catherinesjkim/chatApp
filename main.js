@@ -184,6 +184,7 @@ let handleUserJoined = async (user, mediaType) => {
 // Re: unsubscription:
 // When a remote user unpublishes a track, the local user receives the user-unpublished callback.
 // The SDK automatically releases the corresponding RemoteTrack object, and you do not need to call unsubscribe.
+
 // This method is asynchronous and needs to be used with Promise or async/await.
 // Use async methods when we have a lengthy operations. We usually need such an operation to complete in order
 // to meaningfully continue program execution, but we don't want to "pause" until the operation completes
